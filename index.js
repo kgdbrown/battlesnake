@@ -38,7 +38,7 @@ function makeMatrix (height, width) {
 function mapFood (board, matrix) {
   //console.log("food: "+board.food)
   food = board.food
-  console.log("food length: "+food.length)
+  //console.log("food length: "+food.length)
   for (var i = 0; i<food.length; i++) {
     var foodx = food[i].x
     var foody = food[i].y
@@ -99,7 +99,7 @@ function decideMove (matrix, x, y) {
       previous = i
     }
   }*/
-  
+  console.log("position: "+x + ", "+ y)
   // check up
   if (y == 0 || matrix[y-1][x] == 2) {
     safeMoves[0] = 0
@@ -141,7 +141,7 @@ app.post('/start', (request, response) => {
   //console.log(matrix)
   // Response data
   const data = {
-    color: '#DFFF00',
+    color: '#999966',
     headType: 'bendr',
     tailType: 'small-rattle'    
   }
@@ -154,16 +154,24 @@ app.post('/move', (request, response) => {
   // NOTE: Do something here to generate your move
   const board = request.body.board
   //console.log(board.snakes[0].body)
-  console.log("head: ")
-  const position = [board.snakes[0].body[0].x, board.snakes[0].body[0].y]
+  //console.log("head: ")
+  const mySnake = request.body.you
+  /*for (var i = 0; i < board.snakes.length; i++) {
+    console.log(board.snakes[i])
+    if (board.snakes[i].name == 'hissyphus')
+      mySnake = board.snakes[i]
+  }
+  console.log()*/
+  //console.log(mySnake)
+  const position = [mySnake.body[0].x, mySnake.body[0].y]
   matrix = makeMatrix(height, width)
   //console.log("number of snakes: " + board.snakes.length)
   mapFood(board, matrix)
   mapSnakes(board, matrix)
   console.log(matrix)
   // Response data
-  console.log(position[0])
-  console.log(position[1])
+  //console.log(position[0])
+  //console.log(position[1])
   const data = decideMove(matrix, position[0], position[1])
   console.log(data)
   return response.json(data)
