@@ -21,12 +21,11 @@ app.use(poweredByHandler)
 
 // --- SNAKE LOGIC GOES BELOW THIS LINE ---
 var height, width
-var previous
 var matrix
 const moves = ['up', 'down', 'left', 'right']
 
 function getPosition (board) {
-  snake = board.snakes[0]
+  snake = request.body.you
   head = snake.body[0]
   return head
 }
@@ -102,31 +101,49 @@ function decideMove (matrix, x, y) {
   console.log("position: "+x + ", "+ y)
   // check up
   if (y == 0 || matrix[y-1][x] == 2) {
-    safeMoves[0] = 0
+    safeMoves[0] = 0  
   //  console.log("up not safe")
+  } else if (matrix[y-1][x] == 1) {
+    return { move: 'up' }
   }
   // check down  
   if (y == height-1 || matrix[y+1][x] == 2) {
     safeMoves[1] = 0
   //  console.log("down not safe")
-  }
+  } else if (matrix[y+1][x] == 1)
+    return { move: 'down'}
   // check left
   if (x == 0 || matrix[y][x-1] == 2) {
     safeMoves[2] = 0  
   //  console.log("left not safe")
+  } else if (matrix[y][x-1] == 1) {
+    return { move: 'left'}
   }
+    
   // check right  
   if (x == width-1 || matrix[y][x+1] == 2) {
     safeMoves[3] = 0
   //  console.log("right not safe")
-  }
+  } else if (matrix[y][x+1] == 1) 
+    return { move: 'right' }
   //console.log("safe moves: "+ safeMoves)
 
+  // Move Randomly
+  /*var chosen = false
+  while(!chosen) {
+    var rdm = Math.floor(Math.random() * 4);
+    if (safeMoves[rdm] == 1) {
+      data = { move: moves[rdm] }
+      chosen =  true
+    }
+  }*/
+
+  // Move Predictably
   for (var i = 3; i >= 0; i--){
     if (safeMoves[i] == 1) {
       data = { move: moves[i] }
     }
-  }
+  } 
 
   return data
 }
@@ -170,8 +187,6 @@ app.post('/move', (request, response) => {
   mapSnakes(board, matrix)
   console.log(matrix)
   // Response data
-  //console.log(position[0])
-  //console.log(position[1])
   const data = decideMove(matrix, position[0], position[1])
   console.log(data)
   return response.json(data)
