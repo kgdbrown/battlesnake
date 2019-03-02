@@ -36,12 +36,12 @@ app.post('/start', (request, response) => {
 // Handle POST request to '/move'
 app.post('/move', (request, response) => {
   // NOTE: Do something here to generate your move
-
+  console.log("move left")
   // Response data
   const data = {
-    move: 'up', // one of: ['up','down','left','right']
+    move: 'left', // one of: ['up','down','left','right']
   }
-
+  console.log("move left")
   return response.json(data)
 })
 
