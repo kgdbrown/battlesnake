@@ -100,20 +100,20 @@ function decideMove (matrix, x, y) {
   }*/
   console.log("position: "+x + ", "+ y)
   // check up
-  if (y == 0 || matrix[y-1][x] == 2) {
+  if (y == 0 || matrix[y-1][x] == 2 || ((x == 0 || x == width-1) && y == 1) ){
     safeMoves[0] = 0  
   //  console.log("up not safe")
   } else if (matrix[y-1][x] == 1) {
     return { move: 'up' }
   }
   // check down  
-  if (y == height-1 || matrix[y+1][x] == 2) {
+  if (y == height-1 || matrix[y+1][x] == 2 || ((x == 0 || x == width-1) && y == height-1)) {
     safeMoves[1] = 0
   //  console.log("down not safe")
   } else if (matrix[y+1][x] == 1)
     return { move: 'down'}
   // check left
-  if (x == 0 || matrix[y][x-1] == 2) {
+  if (x == 0 || matrix[y][x-1] == 2 || ((y == 0 || y == height-1) && x == 1)) {
     safeMoves[2] = 0  
   //  console.log("left not safe")
   } else if (matrix[y][x-1] == 1) {
@@ -121,7 +121,7 @@ function decideMove (matrix, x, y) {
   }
     
   // check right  
-  if (x == width-1 || matrix[y][x+1] == 2) {
+  if (x == width-1 || matrix[y][x+1] == 2 || ((y == 0 || y == height-1) && x == width - 1)) {
     safeMoves[3] = 0
   //  console.log("right not safe")
   } else if (matrix[y][x+1] == 1) 
@@ -143,7 +143,7 @@ function decideMove (matrix, x, y) {
     if (safeMoves[i] == 1) {
       data = { move: moves[i] }
     }
-  } 
+  }
 
   return data
 }
