@@ -22,44 +22,70 @@ app.use(poweredByHandler)
 // --- SNAKE LOGIC GOES BELOW THIS LINE ---
 var height, width
 var previous
+var matrix
+const moves = ['up', 'down', 'left', 'right']
+
 function getPosition (board) {
   snake = board.snakes[0]
   head = snake.body[0]
   return head
 }
 
-function makeMatrix (board) {
-  var matrix = []
-  for (var i = 0; i<height; i++) {
-    for (var j = 0; j<width; j++) {
-      matrix[i][j] = 0
+function makeMatrix (height, width) {
+   return Array(height).fill(0).map(x => Array(width).fill(0))
+}
+
+function mapFood (board, matrix) {
+  //console.log("food: "+board.food)
+  food = board.food
+  console.log("food length: "+food.length)
+  for (var i = 0; i<food.length; i++) {
+    var foodx = food[i].x
+    var foody = food[i].y
+    //console.log("food item: "+foodx+", "+foody)
+    matrix[foody][foodx] = 1
+    //console.log("change: "+foody+","+foodx)
+  }
+
+}
+
+function mapSnakes (board, matrix) {
+  var snakes = board.snakes
+  //console.log("num snakes: "+snakes.length)
+  for (var i=0; i<snakes.length; i++) {
+    //console.log(snakes[i])
+    var snake = snakes[i].body
+    for(var j=0; j< snake.length; j++) {
+      segment = snake[j]
+      //console.log("segment: "+snake[j])
+      snakex = snake[j].x
+      snakey = snake[j].y
+      matrix[snakey][snakex] = 2
     }
   }
-  return matrix
 }
 
 function decideMove (board) {
   position = getPosition(board)
   var data
-  const moves = ['up', 'down', 'left', 'right']
   var safeMoves = [1,1,1,1]
   switch (position.y) {
     case 0:
-      console.log("not up!")
+      console.log("wall up!")
       safeMoves[0] = 0
       break;
     case height-1:
-      console.log("not down!")
+      console.log("wall down!")
       safeMoves[1] = 0
       break;
   }
   switch (position.x) {
     case 0:
-      console.log("not left!")
+      console.log("wall left!")
       safeMoves[2] = 0
       break;
     case width-1:
-      console.log("not right!")
+      console.log("wall right!")
       safeMoves[3] = 0
       break; 
   }
@@ -67,7 +93,6 @@ function decideMove (board) {
     safeMoves[previous+1] = 0
   else
     safeMoves[previous-1] = 0  
-  console.log(moves)
   for (var i = 3; i >= 0; i--){
     if (safeMoves[i] == 1) {
       data = { move: moves[i] }
@@ -80,8 +105,11 @@ function decideMove (board) {
 // Handle POST request to '/start'
 app.post('/start', (request, response) => {
   // NOTE: Do something here to start the game
-  height = request.body.board.height
-  width = request.body.board.width
+  board = request.body.board
+  height = board.height
+  width = board.width
+  matrix = makeMatrix(height, width)
+  //console.log(matrix)
   // Response data
   const data = {
     color: '#DFFF00',
@@ -96,13 +124,16 @@ app.post('/start', (request, response) => {
 app.post('/move', (request, response) => {
   // NOTE: Do something here to generate your move
   const board = request.body.board
-  //matrix = makeMatrix(board)
-  console.log(board.snakes[0].body)
-  console.log(board.snakes[0].body[0])
+  //console.log(board.snakes[0].body)
+  console.log("head: ")
+  console.log(board.snakes[0].body[0]/*.x +", "+board.snakes[0].body[0].y*/)
+  matrix = makeMatrix(height, width)
+  //console.log("number of snakes: " + board.snakes.length)
+  mapFood(board, matrix)
+  mapSnakes(board, matrix)
+  console.log(matrix)
   // Response data
-  const data = decideMove(board)/*{
-    move: 'up' // one of: ['up','down','left','right']
-  }*/
+  const data = decideMove(board)
   console.log(data)
   return response.json(data)
 })
